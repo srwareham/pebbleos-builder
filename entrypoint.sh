@@ -48,11 +48,21 @@ pip install -q \
     -e python_libs/pebble-loghash
 
 # ---------------------------------------------------------------------------
-# Configure, build, and bundle
+# Configure, then dispatch to the requested command (default: build)
 # ---------------------------------------------------------------------------
+COMMAND="${1:-build}"
+
 echo "Configuring for board: ${BOARD}"
 ./waf configure --board "${BOARD}"
 
+if [ "${COMMAND}" = "qemu" ]; then
+    echo "Building for QEMU..."
+    ./waf build
+    echo "Launching QEMU emulator..."
+    exec ./waf qemu
+fi
+
+# Default: build + bundle
 echo "Building..."
 ./waf build
 

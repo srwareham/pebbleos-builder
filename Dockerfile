@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-dev \
     libgtk-3-dev \
     libncurses-dev \
+    libsdl2-2.0-0 \
     librsvg2-bin \
     make \
     nodejs \

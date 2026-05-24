@@ -53,6 +53,24 @@ Change `-e BOARD=...` to match your device:
 | QEMU emulator — Pebble 2 | `qemu_flint` |
 | QEMU emulator — Pebble Time Round | `qemu_gabbro` |
 
+## Testing with QEMU
+
+Before/instead of flashing to a watch, you can test your changes on the [qemu](https://www.qemu.org/) emulator. On a Wayland host, the window is forwarded directly to your compositor — no X11 or extra display server needed.
+
+```sh
+docker build -t pebbleos-builder .
+./run-qemu.sh
+```
+
+That's it. The script mounts the Wayland compositor socket into the container, sets the right SDL environment variables, and launches `./waf qemu` inside the container. A Pebble Time emulator window will open on your desktop.
+
+To emulate a different device, set a `BOARD` environment variable in your shell:
+
+```sh
+BOARD=qemu_flint ./run-qemu.sh    # Pebble 2
+BOARD=qemu_gabbro ./run-qemu.sh   # Pebble Time Round
+```
+
 ## Already have the source?
 
 If you have the `pebbleos` source code locally, mount it directly while still mounting `./data`:
