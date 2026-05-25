@@ -5,21 +5,16 @@ Build PebbleOS firmware using docker.
 ## TL;DR
 
 ```sh
-git clone https://github.com/srwareham/pebbleos-builder-docker.git
-cd pebbleos-builder-docker
-
-docker build -t pebbleos-builder .
-
 mkdir -p ./data
 # Build firmware for Pebble Time 2 by default, see Picking the Right Board section to change
-docker run --rm -v "$(pwd)/data:/pebble" -e BOARD=obelix_pvt pebbleos-builder
+docker run --rm -v "$(pwd)/data:/pebble" -e BOARD=obelix_pvt ghcr.io/srwareham/pebbleos-builder
 ```
 
 When it finishes, grab `./data/pebbleos/build/*.pbz` and sideload it onto your watch via the Pebble app.
 
 ## What this does
 
-1. **Build the image** (one-time setup) — installs the toolchain and pre-downloads Python dependencies into the image.
+1. **Pull the image** (one-time, automatic) — the pre-built image from `ghcr.io/srwareham/pebbleos-builder` includes the toolchain and pre-downloaded Python dependencies.
 2. **Run the container** — downloads the PebbleOS source into `./data/pebbleos/`, compiles it, and saves build artifacts there. The Python environment is persisted in `./data/venv/` so nothing needs to be re-downloaded between runs.
 3. **Subsequent runs** — skip the source download and rebuild only what changed.
 
@@ -58,7 +53,6 @@ Change `-e BOARD=...` to match your device:
 Before/instead of flashing to a watch, you can test your changes on the [qemu](https://www.qemu.org/) emulator. On a Wayland host, the window is forwarded directly to your compositor — no X11 or extra display server needed.
 
 ```sh
-docker build -t pebbleos-builder .
 ./run-qemu.sh
 ```
 
@@ -80,7 +74,25 @@ docker run --rm \
   -v "$(pwd)/data:/pebble" \
   -v "/path/to/your/pebbleos:/pebble/pebbleos" \
   -e BOARD=obelix_pvt \
-  pebbleos-builder
+  ghcr.io/srwareham/pebbleos-builder
 ```
 
 The more specific mount (`/pebble/pebbleos`) takes precedence over the broader one, so your local source is used while `./data/venv` still provides the cached Python environment. The container detects the existing repo and skips cloning.
+
+## Building the container locally from source
+
+If you want to build the image yourself rather than pulling from `ghcr.io`:
+
+```sh
+git clone https://github.com/srwareham/pebbleos-builder.git
+cd pebbleos-builder-docker
+
+docker build -t pebbleos-builder .
+```
+
+Then substitute `pebbleos-builder` for `ghcr.io/srwareham/pebbleos-builder` in any of the commands above, for example:
+
+```sh
+mkdir -p ./data
+docker run --rm -v "$(pwd)/data:/pebble" -e BOARD=obelix_pvt pebbleos-builder
+```
