@@ -13,7 +13,9 @@ source "${PEBBLEOS_SDK_HOME}/env.sh"
 # ---------------------------------------------------------------------------
 # Trust the source directory regardless of who owns it on the host
 # ---------------------------------------------------------------------------
-git config --global --add safe.directory "${PEBBLEOS_SRC}"
+# -- Only add safe directory if not already present.
+git config --global --get-all safe.directory 2>/dev/null | grep -qxF "${PEBBLEOS_SRC}" || \
+    git config --global --add safe.directory "${PEBBLEOS_SRC}"
 
 # ---------------------------------------------------------------------------
 # Venv — create at the bind-mounted path on first run, then reuse.
