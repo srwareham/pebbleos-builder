@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export HOME=/pebble/home
+mkdir -p "${HOME}"
+
 # ---------------------------------------------------------------------------
 # Activate SDK (sets PATH entries for arm-none-eabi, qemu, sftool)
 # ---------------------------------------------------------------------------
@@ -23,6 +26,18 @@ if [ ! -f "${VENV_PATH}/bin/pip" ]; then
     python3 -m venv "${VENV_PATH}"
     # Populate with pre-installed packages from the image seed
     cp -a "${VENV_SEED}"/lib/*/site-packages/. "${VENV_PATH}"/lib/*/site-packages/
+    # Copy console_scripts from the seed, rewriting their shebangs to point at
+    # the new venv so they work from the bind-mounted path.
+    for f in "${VENV_SEED}/bin"/*; do
+        fname="$(basename "$f")"
+        dest="${VENV_PATH}/bin/${fname}"
+        [ -d "$f" ] && continue      # skip __pycache__ and similar dirs
+        [ -e "$dest" ] && continue   # keep python/pip/activate created by venv
+        cp "$f" "$dest"
+        if head -1 "$dest" 2>/dev/null | grep -q "^#!${VENV_SEED}"; then
+            sed -i "1s|^#!${VENV_SEED}|#!${VENV_PATH}|" "$dest"
+        fi
+    done
 fi
 
 # ---------------------------------------------------------------------------

@@ -7,7 +7,7 @@ Build PebbleOS firmware using docker.
 ```sh
 mkdir -p ./data
 # Build firmware for Pebble Time 2 by default, see Picking the Right Board section to change
-docker run --rm -v "$(pwd)/data:/pebble" -e BOARD=obelix_pvt ghcr.io/srwareham/pebbleos-builder
+docker run --rm --user "$(id -u):$(id -g)" -v "$(pwd)/data:/pebble" -e BOARD=obelix_pvt ghcr.io/srwareham/pebbleos-builder
 ```
 
 When it finishes, grab `./data/pebbleos/build/*.pbz` and sideload it onto your watch via the Pebble app.
@@ -70,7 +70,7 @@ BOARD=qemu_gabbro ./run-qemu.sh   # Pebble Time Round
 If you have the `pebbleos` source code locally, mount it directly while still mounting `./data`:
 
 ```sh
-docker run --rm \
+docker run --rm --user "$(id -u):$(id -g)" \
   -v "$(pwd)/data:/pebble" \
   -v "/path/to/your/pebbleos:/pebble/pebbleos" \
   -e BOARD=obelix_pvt \
@@ -94,5 +94,5 @@ Then substitute `pebbleos-builder` for `ghcr.io/srwareham/pebbleos-builder` in a
 
 ```sh
 mkdir -p ./data
-docker run --rm -v "$(pwd)/data:/pebble" -e BOARD=obelix_pvt pebbleos-builder
+docker run --rm --user "$(id -u):$(id -g)" -v "$(pwd)/data:/pebble" -e BOARD=obelix_pvt pebbleos-builder
 ```

@@ -40,6 +40,7 @@ TTY_FLAG=
 [ -t 0 ] && TTY_FLAG="-t"
 
 docker run --rm -i ${TTY_FLAG} \
+    --user "$(id -u):$(id -g)" \
     -v "${SCRIPT_DIR}/data:/pebble" \
     -e "BOARD=${BOARD}" \
     -v "${WAYLAND_SOCK}:/run/host-compositor/${WL_DISPLAY}" \
